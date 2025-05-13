@@ -1,0 +1,194 @@
+﻿@model ShareExperience.Models.Story
+
+<div class="container my-5">
+    <div class="card shadow-sm p-4" style="max-width: 700px; margin: auto;">
+        <div class="card-body">
+            <!-- Title -->
+            <h3 class="card-title text-primary fw-bold mb-3">@Model.Title</h3>
+
+            <!-- Vibe Highlight -->
+            <div class="mb-4">
+                <span class="badge @GetVibeClass(Model.Vibe)" style="font-size: 1rem; padding: 0.5rem 1rem;">
+                    @Model.Vibe
+                </span>
+            </div>
+
+            <!-- Content -->
+            <p class="card-text text-muted fs-5 mb-4">@Html.Raw(Model.Content)</p>
+
+            <!-- Comments Section -->
+            <h4 class="card-subtitle mb-3 text-dark">Comments (@Model.Comments.Count)</h4>
+            @if (Model.Comments.Any())
+            {
+                <div class="list-group mb-4">
+                    @foreach (var c in Model.Comments)
+                    {
+                        <div class="list-group-item">
+                            <b class="text-primary">@c.Name:</b> <span class="text-secondary">@c.Message</span>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="text-muted mb-4">No comments yet. Be the first to comment!</p>
+            }
+
+            <!-- Comment Form -->
+            <form asp-action="Comment" method="post" class="needs-validation" novalidate>
+                <input type="hidden" name="storyId" value="@Model.Id" />
+                <div class="mb-3">
+                    <label for="name" class="form-label">Your Name</label>
+                    <input type="text" name="name" id="name" placeholder="Your Name" class="form-control" required />
+                    <div class="invalid-feedback">Please enter your name.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="message" class="form-label">Your Comment</label>
+                    <textarea name="message" id="message" placeholder="Your Comment" class="form-control" required rows="3"></textarea>
+                    <div class="invalid-feedback">Please enter a comment.</div>
+                </div>
+                <button type="submit" class="btn btn-success btn-lg w-100">Add Comment</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+<style>
+    .card {
+        transition: box-shadow 0.3s;
+        border: none;
+    }
+
+        .card:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+    .badge-positive {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .badge-negative {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .badge-mixed {
+        background-color: #ffc107;
+        color: black;
+    }
+
+    .list-group-item {
+        border: none;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #eee;
+    }
+
+        .list-group-item:last-child {
+            border-bottom: none;
+        }
+
+    .form-control:focus {
+        border-color: #005f99;
+        box-shadow: 0 0 0 0.25rem rgba(0, 95, 153, 0.25);
+    }
+
+    .btn-success {
+        transition: background-color 0.3s;
+    }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+    @@media (max-width: 576px) {
+        .card {
+            padding: 1.5rem;
+        }
+    }
+</style>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" integrity="sha512-rstIgDs0xPgmG6RX1Aba4KV5cWJbAMcvRCVmglpam9SoHZiUCyQVDdH2LPlxoHtrv17XWblE/V/PP+Tr04h9A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js" integrity="sha512-6S5LYcn5+nYkB0OI+/+3/FNUADTKJ3fWCT4kmLAh+KLKLXwTwHLuN4rRxFFKbG4HFOJdqAMWsb9H0W0HY0S5Bow==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+    // Fallback to local scripts if CDN fails
+    window.jQuery || document.write('<script src="~/lib/jquery/jquery.min.js"><\/script>');
+    if (!window.jQuery.fn.validate) {
+        document.write('<script src="~/lib/jquery-validate/jquery.validate.min.js"><\/script>');
+        document.write('<script src="~/lib/jquery-validate/additional-methods.min.js"><\/script>');
+    }
+
+    // Bootstrap validation
+    (function () {
+        'use strict';
+        var forms = document.querySelectorAll('.needs-validation');
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+</script>
+<script>
+    // jQuery validation
+    if (typeof jQuery === 'undefined') {
+        console.error('jQuery is not loaded');
+    } else if (!jQuery.fn.validate) {
+        console.error('jQuery Validation plugin is not loaded');
+    } else {
+        console.log('jQuery and Validation plugin loaded, initializing form validation');
+        jQuery(document).ready(function($) {
+            $("form").validate({
+                rules: {
+                    name: {
+                        required: true,
+                        minlength: 2
+                    },
+                    message: {
+                        required: true,
+                        minlength: 5
+                    }
+                },
+                messages: {
+                    name: {
+                        required: "Please enter your name.",
+                        minlength: "Name must be at least 2 characters long."
+                    },
+                    message: {
+                        required: "Please enter a comment.",
+                        minlength: "Comment must be at least 5 characters long."
+                    }
+                },
+                errorElement: "span",
+                errorPlacement: function(error, element) {
+                    error.addClass("text-danger");
+                    error.insertAfter(element);
+                }
+            });
+        });
+    }
+</script>
+
+
+@functions {
+    private string GetVibeClass(string vibe)
+    {
+        return vibe switch
+        {
+            "Positive" => "badge-positive",
+            "Negative" => "badge-negative",
+            "Mixed" => "badge-mixed",
+            _ => "badge-secondary"
+        };
+    }
+}

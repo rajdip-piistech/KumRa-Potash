@@ -1,0 +1,166 @@
+﻿@using Microsoft.AspNetCore.Html
+@model List<ShareExperience.Models.Story>
+
+<div class="container my-5">
+    <!-- Search Form -->
+    <form method="get" asp-action="List" class="mb-5">
+        <div class="input-group w-100 w-md-50 mx-auto">
+            <input name="search" class="form-control" placeholder="Search by Company Name" value="@ViewBag.Search" aria-label="Search by Company Name" />
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-search"></i> Search
+            </button>
+        </div>
+    </form>
+
+    <!-- Stories List -->
+    @if (Model == null || !Model.Any())
+    {
+        <div class="row">
+            <div class="col-12 text-center">
+                <p class="text-muted fs-5">No stories found. Try adjusting your search.</p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                var s = Model[i];
+
+                <div class="col-12 col-md-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-primary mb-3">@s.Title</h5>
+                            <div class="mb-3">
+                                <span class="badge @GetVibeClass(s.Vibe)" style="font-size: 0.9rem; padding: 0.4rem 0.8rem;">
+                                    @s.Vibe
+                                </span>
+                            </div>
+                            <p class="card-text text-secondary">
+                                @RenderContent(s.Content)
+                            </p>
+                            <a asp-action="Details" asp-route-id="@s.Id" class="btn btn-outline-primary btn-sm mt-2">Read More</a>
+                        </div>
+                        <div class="card-footer bg-transparent border-0">
+                            <small class="text-muted">Comments: @(s.Comments?.Count ?? 0)</small>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <!-- Pagination -->
+    @if (Model != null && Model.Any() && ViewBag.TotalPages > 1)
+    {
+        <nav class="mt-5">
+            <ul class="pagination justify-content-center">
+                <!-- Previous -->
+                <li class="page-item @(ViewBag.Page <= 1 ? "disabled" : "")">
+                    <a class="page-link" href="@Url.Action("List", new { search = ViewBag.Search, page = ViewBag.Page - 1 })">
+                        « Previous
+                    </a>
+                </li>
+
+                @{
+                    int startPage = Math.Max(1, ViewBag.Page - 2);
+                    int endPage = Math.Min(ViewBag.TotalPages, ViewBag.Page + 2);
+                    if (endPage - startPage < 4)
+                    {
+                        if (startPage == 1)
+                        {
+                            endPage = Math.Min(ViewBag.TotalPages, startPage + 4);
+                        }
+                        else if (endPage == ViewBag.TotalPages)
+                        {
+                            startPage = Math.Max(1, endPage - 4);
+                        }
+                    }
+                }
+
+                @if (startPage > 1)
+                {
+                    <li class="page-item"><span class="page-link">...</span></li>
+                }
+
+                @for (int i = startPage; i <= endPage; i++)
+                {
+                    <li class="page-item @(i == ViewBag.Page ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("List", new { search = ViewBag.Search, page = i })">@i</a>
+                    </li>
+                }
+
+                @if (endPage < ViewBag.TotalPages)
+                {
+                    <li class="page-item"><span class="page-link">...</span></li>
+                }
+
+                <!-- Next -->
+                <li class="page-item @(ViewBag.Page >= ViewBag.TotalPages ? "disabled" : "")">
+                    <a class="page-link" href="@Url.Action("List", new { search = ViewBag.Search, page = ViewBag.Page + 1 })">
+                        Next »
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>
+
+<!-- Optional Styling to Truncate Text in Cards -->
+<style>
+    .card-text {
+        white-space: normal; /* Use normal or nowrap depending on your design */
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+
+<!-- Bootstrap and Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+@functions {
+    private string GetVibeClass(string vibe)
+    {
+        return vibe switch
+        {
+            "Positive" => "badge bg-success",
+            "Negative" => "badge bg-danger",
+            "Mixed" => "badge bg-warning text-dark",
+            _ => "badge bg-secondary"
+        };
+    }
+
+    private IHtmlContent RenderContent(string content)
+    {
+	    // Decode HTML entities
+	    content = System.Net.WebUtility.HtmlDecode(content);
+
+	    // Replace line breaks and block tags with spaces or nothing
+	    content = content
+		    .Replace("<br>", " ")
+		    .Replace("<br/>", " ")
+		    .Replace("<br />", " ")
+		    .Replace("<p>", "")
+		    .Replace("</p>", "")
+		    .Replace("<div>", "")
+		    .Replace("</div>", "");
+
+	    // Remove all HTML tags (including <strong>)
+	    string cleanContent = System.Text.RegularExpressions.Regex.Replace(content, "<.*?>", string.Empty);
+
+	    // Truncate to 150 characters
+	    string truncated = cleanContent.Length > 150 ? cleanContent.Substring(0, 150) + "..." : cleanContent;
+
+	    return new HtmlString(truncated);
+    }
+
+
+    private string HtmlStripExceptStrong(string input)
+    {
+        // Remove all HTML tags except <strong> and </strong>
+        return System.Text.RegularExpressions.Regex.Replace(input, @"<(?!/?strong\b)[^>]*>", string.Empty);
+    }
+}

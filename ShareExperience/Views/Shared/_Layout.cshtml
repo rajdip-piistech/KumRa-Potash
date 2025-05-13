@@ -1,0 +1,92 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ShareExperience</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/ShareExperience.styles.css" asp-append-version="true" />
+    <style>
+        .navbar-brand img {
+            height: 50px;
+            width: auto;
+            transition: height 0.3s ease;
+        }
+        /* Button Styling with Higher Specificity */
+        .navbar .btn-share-story {
+            background-color: #28a745 !important; /* Green background */
+            color: #fff !important;
+            border: none !important;
+            padding: 0.4rem 1.2rem;
+            border-radius: 12px;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+            .navbar .btn-share-story:hover {
+                background-color: #218838 !important; /* Darker green on hover */
+                transform: scale(1.05);
+            }
+        /* Footer Link Styling */
+        .footer a {
+            color: #007bff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+            .footer a:hover {
+                color: #0056b3;
+                text-decoration: underline;
+            }
+        @@media (max-width: 768px) {
+            .navbar-brand img
+
+        {
+            height: 40px;
+        }
+
+        .navbar .btn-share-story {
+            padding: 0.3rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+                    <ul class="navbar-nav align-items-center">
+                        <li class="nav-item">
+                            <a class="btn btn-share-story" asp-area="" asp-controller="Story" asp-action="Create">Share Story</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            © 2025 - ShareExperience - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
